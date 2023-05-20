@@ -25,4 +25,10 @@ public class DetailApplicantResponse
     private String cvPath;
     private Date applyDate;
     private Date dueDate;
+    private String status;
+    private String remark;
+    private String approveBy;
+    private String rejectBy;
+    private Date rejectAt;
+    private Date approveAt;
 }

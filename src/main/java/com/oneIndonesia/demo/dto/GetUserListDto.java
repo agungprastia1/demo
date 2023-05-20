@@ -12,11 +12,12 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SaveOrUpdatePostinganRequest {
+public class GetUserListDto {
     private Long id;
-    private String title;
-    private Long categoryId;
-    private String description;
-    private Date dueDate;
-    private Long salary;
+    private String user;
+    private String email;
+    private String noHp;
+    private String role;
+    private Date createAt;
+    private Date updatedAt;
 }

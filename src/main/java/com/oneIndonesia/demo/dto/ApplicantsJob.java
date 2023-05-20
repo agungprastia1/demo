@@ -17,7 +17,6 @@ import java.util.Date;
 public class ApplicantsJob {
     private Long id;
     private Long postinganId;
-    private Long jobseeker;
     private Long recruiter;
     private String description;
     private MultipartFile file;

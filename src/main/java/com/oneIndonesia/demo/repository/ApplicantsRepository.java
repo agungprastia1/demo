@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Repository
 public interface ApplicantsRepository extends JpaRepository<Applicants,Long> {
@@ -72,4 +73,6 @@ public interface ApplicantsRepository extends JpaRepository<Applicants,Long> {
                     "and(a.user like %?7% or \"All\" like %?7%)",nativeQuery = true)
     Page<GetApplicantListInf> getListApplicant(Serializable serializable, String s, String s1, String s2, String s3, String s4, String s5, String s6, Pageable pageable);
 
+@Query(value = "select a from Applicants a where a.id in ?1")
+    List<Applicants> getApplicant(List<Long> id);
 }

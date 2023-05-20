@@ -105,9 +105,15 @@ public class FeatureService {
         }
     }
 
-    public BaseResponse<Long> saveOrUpdatePostingan(SaveOrUpdatePostinganRequest request) {
+    public BaseResponse<Long> saveOrUpdatePostingan(SaveOrUpdatePostinganRequest request,User user) {
         if (request.getId() == null) {
+            if (user.getRoleId()!=2){
+                return BaseResponse.<Long>builder()
+                        .status(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value())
+                        .message("Id "+user.getId()+" "+HttpStatus.NON_AUTHORITATIVE_INFORMATION.getReasonPhrase()).build();
+            }
             Postingan postingan = modelMapper.map(request, Postingan.class);
+            postingan.setRecruiter(user.getId());
             postingan.setCreateAt(new Date());
             Long id = postinganRepository.save(postingan).getId();
             return BaseResponse.<Long>builder()
@@ -122,11 +128,17 @@ public class FeatureService {
                         .message(HttpStatus.NO_CONTENT.getReasonPhrase())
                         .build();
             }
+            if (user.getRoleId()!=2){
+                return BaseResponse.<Long>builder()
+                        .status(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value())
+                        .message("Id "+user.getId()+" "+HttpStatus.NON_AUTHORITATIVE_INFORMATION.getReasonPhrase()).build();
+            }
+
             Postingan postinganMap = Postingan.builder()
                     .id(request.getId())
                     .title(request.getTitle())
                     .categoryId(request.getCategoryId())
-                    .recruiter(request.getRecruiter())
+                    .recruiter(user.getId())
                     .description(request.getDescription())
                     .dueDate(request.getDueDate())
                     .updateAt(new Date())
@@ -139,7 +151,7 @@ public class FeatureService {
         }
     }
 
-    public BaseResponse<Long> applyJob(ApplicantsJob request) throws IOException {
+    public BaseResponse<Long> applyJob(ApplicantsJob request,User user) throws IOException {
         File file = new File(resourceLoader.getResource("classpath:store/").getFile() + "/" + request.getFile().getOriginalFilename());
 
         BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
@@ -148,7 +160,7 @@ public class FeatureService {
 
         Applicants applicantsJob = Applicants.builder()
                 .postinganId(request.getPostinganId())
-                .jobseeker(request.getJobseeker())
+                .jobseeker(user.getId())
                 .recruiter(request.getRecruiter())
                 .description(request.getDescription())
                 .fileName(request.getFile().getOriginalFilename())
@@ -170,6 +182,8 @@ public class FeatureService {
                         .message("Data id " + id + " is not found!").build();
             }
             Optional<User> user = userRepository.findById(applicants.get().getJobseeker());
+            Optional<User> approver = userRepository.findById(applicants.get().getJobseeker());
+            Optional<User> rejection = userRepository.findById(applicants.get().getJobseeker());
             Optional<Postingan> postingan = postinganRepository.findById(applicants.get().getPostinganId());
             Optional<Category> category = categoryRepository.findById(postingan.get().getCategoryId());
 
@@ -183,7 +197,14 @@ public class FeatureService {
                     .cv(applicants.get().getFileName())
                     .cvPath(applicants.get().getPath())
                     .applyDate(applicants.get().getCreateAt())
-                    .dueDate(postingan.get().getDueDate()).build();
+                    .dueDate(postingan.get().getDueDate())
+                    .status(applicants.get().getStatus())
+                    .remark(applicants.get().getRemark())
+                    .approveAt(applicants.get().getApprovedAt())
+                    .rejectAt(applicants.get().getRejectedAt())
+                    .approveBy(approver.isEmpty()?null:approver.get().getUser())
+                    .rejectBy(rejection.isEmpty()?null:rejection.get().getUser())
+                    .build();
             return BaseResponse.<DetailApplicantResponse>builder()
                     .status(HttpStatus.OK.value())
                     .message(HttpStatus.OK.getReasonPhrase())
@@ -313,4 +334,56 @@ public class FeatureService {
                 .data(response)
                 .build();
     }
+
+
+    public BaseResponse<List<Long>> approveJobApply(JobRequest request,User user) {
+        List<Applicants> applicants = applicantsRepository.getApplicant(request.getId());
+        List<Applicants> applicantsList = new ArrayList<>();
+        if (applicants.isEmpty()){
+            return BaseResponse.<List<Long>>builder()
+                    .status(HttpStatus.NO_CONTENT.value())
+                    .message(HttpStatus.NO_CONTENT.getReasonPhrase())
+                    .build();
+        }
+        List<Long> id = new ArrayList<>();
+        for (Applicants app :applicants){
+            id.add(app.getId());
+            app.setStatus("Approved");
+            app.setApprovedAt(new Date());
+            app.setApprovedBy(user.getId());
+            applicantsList.add(app);
+        }
+        applicantsRepository.saveAll(applicantsList);
+        return BaseResponse.<List<Long>>builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.getReasonPhrase())
+                .data(id)
+                .build();
     }
+
+    public BaseResponse<List<Long>> rejectApplication(JobRequest request,User user) {
+        List<Applicants> applicants = applicantsRepository.getApplicant(request.getId());
+        List<Applicants> applicantsList = new ArrayList<>();
+        if (applicants.isEmpty()){
+            return BaseResponse.<List<Long>>builder()
+                    .status(HttpStatus.NO_CONTENT.value())
+                    .message(HttpStatus.NO_CONTENT.getReasonPhrase())
+                    .build();
+        }
+        List<Long> id = new ArrayList<>();
+        for (Applicants app :applicants){
+            id.add(app.getId());
+            app.setStatus("Rejected");
+            app.setRemark(request.getRemark());
+            app.setRejectedAt(new Date());
+            app.setRejectedBy(user.getId());
+            applicantsList.add(app);
+        }
+        applicantsRepository.saveAll(applicantsList);
+        return BaseResponse.<List<Long>>builder()
+                .status(HttpStatus.OK.value())
+                .message(HttpStatus.OK.getReasonPhrase())
+                .data(id)
+                .build();
+    }
+}

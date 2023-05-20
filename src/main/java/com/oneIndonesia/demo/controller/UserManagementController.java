@@ -2,6 +2,8 @@ package com.oneIndonesia.demo.controller;
 
 import com.oneIndonesia.demo.dto.AddUserRequest;
 import com.oneIndonesia.demo.dto.BaseResponse;
+import com.oneIndonesia.demo.dto.GetUserListRequest;
+import com.oneIndonesia.demo.dto.GetUserListResponse;
 import com.oneIndonesia.demo.model.User;
 import com.oneIndonesia.demo.service.UserManagementService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,5 +29,10 @@ public class UserManagementController {
     @PostMapping("/register")
     public BaseResponse<User> register (@RequestBody User request){
         return userManagementService.register(request);
+    }
+
+    @PostMapping(path = "/getListUser")
+    public BaseResponse<GetUserListResponse> getListUser(@RequestBody GetUserListRequest request){
+        return userManagementService.getListUser(request);
     }
 }

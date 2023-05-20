@@ -1,17 +1,17 @@
 package com.oneIndonesia.demo.controller;
 
-import com.fasterxml.jackson.databind.Module;
 import com.oneIndonesia.demo.dto.*;
+import com.oneIndonesia.demo.model.User;
 import com.oneIndonesia.demo.service.FeatureService;
+import com.oneIndonesia.demo.util.ClaimHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/features")
@@ -31,13 +31,15 @@ public class FeatureController {
     }
 
     @PostMapping(path = "/saveOrUpdatePostingan")
-    public BaseResponse<Long> saveOrUpdatePostingan(@RequestBody SaveOrUpdatePostinganRequest request){
-        return featureService.saveOrUpdatePostingan(request);
+    public BaseResponse<Long> saveOrUpdatePostingan(@RequestBody SaveOrUpdatePostinganRequest request,Authentication authentication){
+        User user = ClaimHelper.getUser(authentication);
+        return featureService.saveOrUpdatePostingan(request,user);
     }
 
     @PostMapping(path = "/applyJob")
     public BaseResponse<Long> applyJob(@ModelAttribute ApplicantsJob applicantsJob, Authentication authentication) throws IOException {
-        return featureService.applyJob(applicantsJob);
+        User user =  ClaimHelper.getUser(authentication);
+        return featureService.applyJob(applicantsJob,user);
     }
 
     @GetMapping("/getDetailApplicant")
@@ -65,6 +67,18 @@ public class FeatureController {
         return featureService.getListApplicantList(request);
     }
 
-//    @PostMapping(path = "/getListUser")
+    @PostMapping(path = "/approveApplicant")
+    private BaseResponse<List<Long>> aproveJobApply(@RequestBody JobRequest request, Authentication authentication){
+        User user = ClaimHelper.getUser(authentication);
+        return featureService.approveJobApply(request,user);
+    }
+
+    @PostMapping(path = "/rejectApplicant")
+    private BaseResponse<List<Long>> rejectApplicant(@RequestBody JobRequest request, Authentication authentication){
+        User user = ClaimHelper.getUser(authentication);
+        return featureService.rejectApplication(request,user);
+    }
+
+
 
 }
