@@ -12,8 +12,4 @@ public class ClaimHelper {
         authentication = SecurityContextHolder.getContext().getAuthentication();
        return (User) authentication.getPrincipal();
     }
-
-//    public static Long getRoleId(Authentication authentication){
-//
-//    }
 }

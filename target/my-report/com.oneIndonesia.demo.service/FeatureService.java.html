@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FeatureService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.oneIndonesia.demo.service</a> &gt; <span class="el_source">FeatureService.java</span></div><h1>FeatureService.java</h1><pre class="source lang-java linenums">package com.oneIndonesia.demo.service;
+
+import com.fasterxml.jackson.databind.ser.Serializers;
+import com.oneIndonesia.demo.dto.*;
+import com.oneIndonesia.demo.model.*;
+import com.oneIndonesia.demo.repository.*;
+import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+<span class="fc" id="L37">@Log4j2</span>
+<span class="fc" id="L38">public class FeatureService {</span>
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private PostinganRepository postinganRepository;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ApplicantsRepository applicantsRepository;
+
+    public BaseResponse&lt;Long&gt; saveOrUpdateRole(SaveOrUpdateRoleRequest request) {
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (request.getId() == null) {</span>
+<span class="nc" id="L62">            Role role = modelMapper.map(request, Role.class);</span>
+<span class="nc" id="L63">            role.setCreateAt(new Date());</span>
+<span class="nc" id="L64">            Long id = roleRepository.save(role).getId();</span>
+<span class="nc" id="L65">            return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L66">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L67">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L68">                    .data(id).build();</span>
+        } else {
+<span class="nc" id="L70">            Optional&lt;Role&gt; optionalRole = roleRepository.findById(request.getId());</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            if (optionalRole.isEmpty()) {</span>
+<span class="nc" id="L72">                return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L73">                        .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L74">                        .message(HttpStatus.NO_CONTENT.getReasonPhrase())</span>
+<span class="nc" id="L75">                        .build();</span>
+            }
+<span class="nc" id="L77">            Role role = modelMapper.map(request, Role.class);</span>
+<span class="nc" id="L78">            Long id = roleRepository.save(role).getId();</span>
+<span class="nc" id="L79">            return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L80">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L81">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L82">                    .data(id).build();</span>
+        }
+    }
+
+    public BaseResponse&lt;Long&gt; saveOrUpdateCategory(@RequestBody SaveOrUpdateCategoryRequest request) {
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        if (request.getId() == null) {</span>
+<span class="nc" id="L88">            Category category = modelMapper.map(request, Category.class);</span>
+<span class="nc" id="L89">            category.setCreateAt(new Date());</span>
+<span class="nc" id="L90">            Long id = categoryRepository.save(category).getId();</span>
+<span class="nc" id="L91">            return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L92">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L93">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L94">                    .data(id).build();</span>
+        } else {
+<span class="nc" id="L96">            Optional&lt;Category&gt; category = categoryRepository.findById(request.getId());</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            if (category.isEmpty()) {</span>
+<span class="nc" id="L98">                return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L99">                        .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L100">                        .message(HttpStatus.NO_CONTENT.getReasonPhrase())</span>
+<span class="nc" id="L101">                        .build();</span>
+            }
+<span class="nc" id="L103">            Category categori = modelMapper.map(request, Category.class);</span>
+<span class="nc" id="L104">            Long id = categoryRepository.save(categori).getId();</span>
+<span class="nc" id="L105">            return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L106">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L107">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L108">                    .data(id).build();</span>
+        }
+    }
+
+    public BaseResponse&lt;Long&gt; saveOrUpdatePostingan(SaveOrUpdatePostinganRequest request,User user) {
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (request.getId() == null) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            if (user.getRoleId()!=2){</span>
+<span class="nc" id="L115">                return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L116">                        .status(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value())</span>
+<span class="nc" id="L117">                        .message(&quot;Id &quot;+user.getId()+&quot; &quot;+HttpStatus.NON_AUTHORITATIVE_INFORMATION.getReasonPhrase()).build();</span>
+            }
+<span class="nc" id="L119">            Postingan postingan = modelMapper.map(request, Postingan.class);</span>
+<span class="nc" id="L120">            postingan.setRecruiter(user.getId());</span>
+<span class="nc" id="L121">            postingan.setCreateAt(new Date());</span>
+<span class="nc" id="L122">            Long id = postinganRepository.save(postingan).getId();</span>
+<span class="nc" id="L123">            return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L124">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L125">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L126">                    .data(id).build();</span>
+        } else {
+<span class="nc" id="L128">            Optional&lt;Postingan&gt; postingan = postinganRepository.findById(request.getId());</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">            if (postingan.isEmpty()) {</span>
+<span class="nc" id="L130">                return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L131">                        .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L132">                        .message(HttpStatus.NO_CONTENT.getReasonPhrase())</span>
+<span class="nc" id="L133">                        .build();</span>
+            }
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            if (user.getRoleId()!=2){</span>
+<span class="nc" id="L136">                return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L137">                        .status(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value())</span>
+<span class="nc" id="L138">                        .message(&quot;Id &quot;+user.getId()+&quot; &quot;+HttpStatus.NON_AUTHORITATIVE_INFORMATION.getReasonPhrase()).build();</span>
+            }
+
+<span class="nc" id="L141">            Postingan postinganMap = Postingan.builder()</span>
+<span class="nc" id="L142">                    .id(request.getId())</span>
+<span class="nc" id="L143">                    .title(request.getTitle())</span>
+<span class="nc" id="L144">                    .categoryId(request.getCategoryId())</span>
+<span class="nc" id="L145">                    .recruiter(user.getId())</span>
+<span class="nc" id="L146">                    .description(request.getDescription())</span>
+<span class="nc" id="L147">                    .dueDate(request.getDueDate())</span>
+<span class="nc" id="L148">                    .updateAt(new Date())</span>
+<span class="nc" id="L149">                    .salary(request.getSalary()).build();</span>
+<span class="nc" id="L150">            Long id = postinganRepository.save(postinganMap).getId();</span>
+<span class="nc" id="L151">            return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L152">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L153">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L154">                    .data(id).build();</span>
+        }
+    }
+
+    public BaseResponse&lt;Long&gt; applyJob(ApplicantsJob request,User user) throws IOException {
+
+<span class="nc" id="L160">        File file = new File(resourceLoader.getResource(&quot;&quot;).getFile() +&quot;/&quot;+ request.getFile().getOriginalFilename());</span>
+<span class="nc" id="L161">        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file));</span>
+<span class="nc" id="L162">        stream.write(request.getFile().getBytes());</span>
+<span class="nc" id="L163">        stream.close();</span>
+
+<span class="nc" id="L165">        Applicants applicantsJob = Applicants.builder()</span>
+<span class="nc" id="L166">                .postinganId(request.getPostinganId())</span>
+<span class="nc" id="L167">                .jobseeker(user.getId())</span>
+<span class="nc" id="L168">                .recruiter(request.getRecruiter())</span>
+<span class="nc" id="L169">                .description(request.getDescription())</span>
+<span class="nc" id="L170">                .fileName(request.getFile().getOriginalFilename())</span>
+<span class="nc" id="L171">                .path(file.getAbsolutePath())</span>
+<span class="nc" id="L172">                .createAt(new Date()).build();</span>
+<span class="nc" id="L173">        Long id = applicantsRepository.save(applicantsJob).getId();</span>
+<span class="nc" id="L174">        return BaseResponse.&lt;Long&gt;builder()</span>
+<span class="nc" id="L175">                .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L176">                .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L177">                .data(id).build();</span>
+    }
+
+    public BaseResponse&lt;DetailApplicantResponse&gt; getDetailApplicant(Long id) {
+<span class="nc" id="L181">        Optional&lt;Applicants&gt; applicants = applicantsRepository.findById(id);</span>
+        try {
+<span class="nc bnc" id="L183" title="All 2 branches missed.">            if (applicants.isEmpty()) {</span>
+<span class="nc" id="L184">                return BaseResponse.&lt;DetailApplicantResponse&gt;builder()</span>
+<span class="nc" id="L185">                        .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L186">                        .message(&quot;Data id &quot; + id + &quot; is not found!&quot;).build();</span>
+            }
+<span class="nc" id="L188">            Optional&lt;User&gt; user = userRepository.findById(applicants.get().getJobseeker());</span>
+<span class="nc" id="L189">            Optional&lt;User&gt; approver = userRepository.findById(applicants.get().getJobseeker());</span>
+<span class="nc" id="L190">            Optional&lt;User&gt; rejection = userRepository.findById(applicants.get().getJobseeker());</span>
+<span class="nc" id="L191">            Optional&lt;Postingan&gt; postingan = postinganRepository.findById(applicants.get().getPostinganId());</span>
+<span class="nc" id="L192">            Optional&lt;Category&gt; category = categoryRepository.findById(postingan.get().getCategoryId());</span>
+
+<span class="nc" id="L194">            DetailApplicantResponse detailApplicantResponse = DetailApplicantResponse.builder()</span>
+<span class="nc" id="L195">                    .id(applicants.get().getId())</span>
+<span class="nc" id="L196">                    .name(user.get().getUsername())</span>
+<span class="nc" id="L197">                    .email(user.get().getEmail())</span>
+<span class="nc" id="L198">                    .noHp(user.get().getNoHp())</span>
+<span class="nc" id="L199">                    .jobTittle(postingan.get().getTitle())</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">                    .category(category.isEmpty() ? null : category.get().getCategory())</span>
+<span class="nc" id="L201">                    .cv(applicants.get().getFileName())</span>
+<span class="nc" id="L202">                    .cvPath(applicants.get().getPath())</span>
+<span class="nc" id="L203">                    .applyDate(applicants.get().getCreateAt())</span>
+<span class="nc" id="L204">                    .dueDate(postingan.get().getDueDate())</span>
+<span class="nc" id="L205">                    .status(applicants.get().getStatus())</span>
+<span class="nc" id="L206">                    .remark(applicants.get().getRemark())</span>
+<span class="nc" id="L207">                    .approveAt(applicants.get().getApprovedAt())</span>
+<span class="nc" id="L208">                    .rejectAt(applicants.get().getRejectedAt())</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">                    .approveBy(approver.isEmpty()?null:approver.get().getUser())</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">                    .rejectBy(rejection.isEmpty()?null:rejection.get().getUser())</span>
+<span class="nc" id="L211">                    .build();</span>
+<span class="nc" id="L212">            return BaseResponse.&lt;DetailApplicantResponse&gt;builder()</span>
+<span class="nc" id="L213">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L214">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L215">                    .data(detailApplicantResponse)</span>
+<span class="nc" id="L216">                    .build();</span>
+<span class="nc" id="L217">        } catch (Exception e) {</span>
+<span class="nc" id="L218">            return BaseResponse.&lt;DetailApplicantResponse&gt;builder()</span>
+<span class="nc" id="L219">                    .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L220">                    .message(HttpStatus.NO_CONTENT.getReasonPhrase() + &quot; &quot; + e.getMessage()).build();</span>
+        }
+    }
+
+    public Resource downloadCv(Long id) {
+<span class="nc" id="L225">        Optional&lt;Applicants&gt; applicants = applicantsRepository.findById(id);</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (applicants.isEmpty()) {</span>
+<span class="nc" id="L227">            return null;</span>
+        }
+<span class="nc" id="L229">        return resourceLoader.getResource(&quot;/&quot; + applicants.get().getFileName());</span>
+    }
+
+    public BaseResponse&lt;GetDetailPostinganResponse&gt; getDetailPostingan(Long id) {
+<span class="nc" id="L233">        Optional&lt;Postingan&gt; postingan = postinganRepository.findById(id);</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">        if (postingan.isEmpty()) {</span>
+<span class="nc" id="L235">            return BaseResponse.&lt;GetDetailPostinganResponse&gt;builder()</span>
+<span class="nc" id="L236">                    .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L237">                    .message(&quot;Data with id &quot; + id + &quot; not found!&quot;).build();</span>
+        }
+<span class="nc" id="L239">        Optional&lt;User&gt; user = null;</span>
+<span class="nc" id="L240">        Optional&lt;Category&gt; category = null;</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        if (postingan.get().getRecruiter() != null) {</span>
+<span class="nc" id="L242">            user = userRepository.findById(postingan.get().getRecruiter());</span>
+        }
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        if (postingan.get().getCategoryId() != null) {</span>
+<span class="nc" id="L245">            category = categoryRepository.findById(postingan.get().getCategoryId());</span>
+        }
+<span class="nc" id="L247">        GetDetailPostinganResponse getDetailPostinganResponse = modelMapper.map(postingan.get(), GetDetailPostinganResponse.class);</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        getDetailPostinganResponse.setCategory(category.isEmpty() ? null : category.get().getCategory());</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">        getDetailPostinganResponse.setRecruiter(user.isEmpty() ? null : user.get().getUser());</span>
+<span class="nc" id="L250">        return BaseResponse.&lt;GetDetailPostinganResponse&gt;builder()</span>
+<span class="nc" id="L251">                .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L252">                .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L253">                .data(getDetailPostinganResponse).build();</span>
+    }
+
+    public BaseResponse&lt;GetListPostinganResponse&gt; getPostinganList(GetPostinganListRequest request) {
+<span class="nc bnc" id="L257" title="All 2 branches missed.">        request.setType(request.getSortBy() == null ? &quot;id&quot; : request.getSortBy());</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        request.setSortType(request.getSortType() == null ? &quot;DESC&quot; : request.getSortType());</span>
+        JpaSort sortProgrest;
+<span class="nc bnc" id="L260" title="All 2 branches missed.">        if (request.getSortType().equalsIgnoreCase(&quot;ASC&quot;)) {</span>
+<span class="nc" id="L261">            sortProgrest = JpaSort.unsafe(Sort.Direction.ASC, &quot;(&quot; + request.getSortBy() + &quot;)&quot;);</span>
+        } else {
+<span class="nc" id="L263">            sortProgrest = JpaSort.unsafe(Sort.Direction.DESC, &quot;(&quot; + request.getSortBy() + &quot;)&quot;);</span>
+        }
+<span class="nc" id="L265">        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getDataPerPage(), sortProgrest);</span>
+<span class="nc" id="L266">        List&lt;GetDetailPostinganResponse&gt; detailPostinganResponses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L267">        Page&lt;GetDetailPostinganInf&gt; postinganList = postinganRepository.getPostinganList(</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">                request.getId()==null?&quot;All&quot;:request.getId(),</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">                request.getTitle()==null?&quot;All&quot;:request.getTitle(),</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">                request.getCategory()==null?&quot;All&quot;: request.getCategory(),</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">                request.getRecruiter() ==null?&quot;All&quot;: request.getRecruiter(),</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">                request.getDescription()==null?&quot;All&quot;:request.getDescription(),</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">                request.getDueDate() ==null?&quot;All&quot;:request.getDueDate(),</span>
+<span class="nc bnc" id="L274" title="All 2 branches missed.">                request.getSalary()==null? &quot;All&quot; :request.getSalary(),</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">                request.getCreateAt()==null?&quot;All&quot;:request.getCreateAt(),</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">                request.getUpdateAt()==null?&quot;All&quot;:request.getUpdateAt(),</span>
+                pageable
+                );
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        if (postinganList.hasContent()){</span>
+<span class="nc" id="L280">            postinganList.forEach(a -&gt; detailPostinganResponses.add(modelMapper.map(a, GetDetailPostinganResponse.class)));</span>
+<span class="nc" id="L281">            GetListPostinganResponse response = GetListPostinganResponse.builder()</span>
+<span class="nc" id="L282">                    .pageNumber(postinganList.getNumber())</span>
+<span class="nc" id="L283">                    .totalPage(postinganList.getTotalPages())</span>
+<span class="nc" id="L284">                    .numberOfElement(postinganList.getNumberOfElements())</span>
+<span class="nc" id="L285">                    .totalElement(postinganList.getTotalElements())</span>
+<span class="nc" id="L286">                    .content(detailPostinganResponses)</span>
+<span class="nc" id="L287">                    .build();</span>
+<span class="nc" id="L288">            return BaseResponse.&lt;GetListPostinganResponse&gt;builder()</span>
+<span class="nc" id="L289">                    .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L290">                    .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L291">                    .data(response).build();</span>
+        }else {
+<span class="nc" id="L293">            return BaseResponse.&lt;GetListPostinganResponse&gt;builder()</span>
+<span class="nc" id="L294">                    .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L295">                    .message(HttpStatus.NO_CONTENT.getReasonPhrase()).build();</span>
+        }
+    }
+
+    public BaseResponse&lt;GetListApplicantListResponse&gt; getListApplicantList( GetListApplicantRequest request){
+<span class="nc bnc" id="L300" title="All 2 branches missed.">        request.setType(request.getSortBy() == null ? &quot;id&quot; : request.getSortBy());</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">        request.setSortType(request.getSortType() == null ? &quot;DESC&quot; : request.getSortType());</span>
+        JpaSort sortProgrest;
+<span class="nc bnc" id="L303" title="All 2 branches missed.">        if (request.getSortType().equalsIgnoreCase(&quot;ASC&quot;)) {</span>
+<span class="nc" id="L304">            sortProgrest = JpaSort.unsafe(Sort.Direction.ASC, &quot;(&quot; + request.getSortBy() + &quot;)&quot;);</span>
+        } else {
+<span class="nc" id="L306">            sortProgrest = JpaSort.unsafe(Sort.Direction.DESC, &quot;(&quot; + request.getSortBy() + &quot;)&quot;);</span>
+        }
+<span class="nc" id="L308">        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getDataPerPage(), sortProgrest);</span>
+<span class="nc" id="L309">        List&lt;GetAplicantListDto&gt; getAplicantListDtos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L310">        Page&lt;GetApplicantListInf&gt; applicantListInf = applicantsRepository.getListApplicant(</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">                request.getId() ==null?&quot;All&quot;:request.getId(),</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">                request.getTitle()==null?&quot;All&quot;:request.getTitle(),</span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">                request.getCvName()==null?&quot;All&quot;:request.getCvName(),</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">                request.getStatus()==null?&quot;All&quot;:request.getStatus(),</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">                request.getRemark()==null?&quot;All&quot;:request.getRemark(),</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">                request.getCategory()==null?&quot;All&quot;:request.getCategory(),</span>
+<span class="nc bnc" id="L317" title="All 2 branches missed.">                request.getUser()==null?&quot;All&quot;:request.getUser(),</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">                request.getCreateDate()==null?&quot;All&quot;:request.getCreateDate(),</span>
+                pageable
+        );
+<span class="nc bnc" id="L321" title="All 2 branches missed.">        if (applicantListInf.isEmpty()){</span>
+<span class="nc" id="L322">            return BaseResponse.&lt;GetListApplicantListResponse&gt;builder()</span>
+<span class="nc" id="L323">                    .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L324">                    .message(HttpStatus.NO_CONTENT.getReasonPhrase())</span>
+<span class="nc" id="L325">                    .build();</span>
+        }
+<span class="nc" id="L327">        applicantListInf.forEach(a -&gt; getAplicantListDtos.add(modelMapper.map(a,GetAplicantListDto.class)));</span>
+<span class="nc" id="L328">        GetListApplicantListResponse response = GetListApplicantListResponse.builder()</span>
+<span class="nc" id="L329">                .totalPage(applicantListInf.getTotalPages())</span>
+<span class="nc" id="L330">                .pageNumber(applicantListInf.getNumber())</span>
+<span class="nc" id="L331">                .numberOfElement(applicantListInf.getNumberOfElements())</span>
+<span class="nc" id="L332">                .totalElement(applicantListInf.getTotalElements())</span>
+<span class="nc" id="L333">                .content(getAplicantListDtos)</span>
+<span class="nc" id="L334">                .build();</span>
+<span class="nc" id="L335">        return BaseResponse.&lt;GetListApplicantListResponse&gt;builder()</span>
+<span class="nc" id="L336">                .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L337">                .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L338">                .data(response)</span>
+<span class="nc" id="L339">                .build();</span>
+    }
+
+
+    public BaseResponse&lt;List&lt;Long&gt;&gt; approveJobApply(JobRequest request,User user) {
+<span class="nc" id="L344">        List&lt;Applicants&gt; applicants = applicantsRepository.getApplicant(request.getId());</span>
+<span class="nc" id="L345">        List&lt;Applicants&gt; applicantsList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L346" title="All 2 branches missed.">        if (applicants.isEmpty()){</span>
+<span class="nc" id="L347">            return BaseResponse.&lt;List&lt;Long&gt;&gt;builder()</span>
+<span class="nc" id="L348">                    .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L349">                    .message(HttpStatus.NO_CONTENT.getReasonPhrase())</span>
+<span class="nc" id="L350">                    .build();</span>
+        }
+<span class="nc" id="L352">        List&lt;Long&gt; id = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L353" title="All 2 branches missed.">        for (Applicants app :applicants){</span>
+<span class="nc" id="L354">            id.add(app.getId());</span>
+<span class="nc" id="L355">            app.setStatus(&quot;Approved&quot;);</span>
+<span class="nc" id="L356">            app.setApprovedAt(new Date());</span>
+<span class="nc" id="L357">            app.setApprovedBy(user.getId());</span>
+<span class="nc" id="L358">            applicantsList.add(app);</span>
+<span class="nc" id="L359">        }</span>
+<span class="nc" id="L360">        applicantsRepository.saveAll(applicantsList);</span>
+<span class="nc" id="L361">        return BaseResponse.&lt;List&lt;Long&gt;&gt;builder()</span>
+<span class="nc" id="L362">                .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L363">                .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L364">                .data(id)</span>
+<span class="nc" id="L365">                .build();</span>
+    }
+
+    public BaseResponse&lt;List&lt;Long&gt;&gt; rejectApplication(JobRequest request,User user) {
+<span class="nc" id="L369">        List&lt;Applicants&gt; applicants = applicantsRepository.getApplicant(request.getId());</span>
+<span class="nc" id="L370">        List&lt;Applicants&gt; applicantsList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L371" title="All 2 branches missed.">        if (applicants.isEmpty()){</span>
+<span class="nc" id="L372">            return BaseResponse.&lt;List&lt;Long&gt;&gt;builder()</span>
+<span class="nc" id="L373">                    .status(HttpStatus.NO_CONTENT.value())</span>
+<span class="nc" id="L374">                    .message(HttpStatus.NO_CONTENT.getReasonPhrase())</span>
+<span class="nc" id="L375">                    .build();</span>
+        }
+<span class="nc" id="L377">        List&lt;Long&gt; id = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L378" title="All 2 branches missed.">        for (Applicants app :applicants){</span>
+<span class="nc" id="L379">            id.add(app.getId());</span>
+<span class="nc" id="L380">            app.setStatus(&quot;Rejected&quot;);</span>
+<span class="nc" id="L381">            app.setRemark(request.getRemark());</span>
+<span class="nc" id="L382">            app.setRejectedAt(new Date());</span>
+<span class="nc" id="L383">            app.setRejectedBy(user.getId());</span>
+<span class="nc" id="L384">            applicantsList.add(app);</span>
+<span class="nc" id="L385">        }</span>
+<span class="nc" id="L386">        applicantsRepository.saveAll(applicantsList);</span>
+<span class="nc" id="L387">        return BaseResponse.&lt;List&lt;Long&gt;&gt;builder()</span>
+<span class="nc" id="L388">                .status(HttpStatus.OK.value())</span>
+<span class="nc" id="L389">                .message(HttpStatus.OK.getReasonPhrase())</span>
+<span class="nc" id="L390">                .data(id)</span>
+<span class="nc" id="L391">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
