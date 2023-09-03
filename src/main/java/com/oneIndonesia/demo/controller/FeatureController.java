@@ -21,61 +21,67 @@ public class FeatureController {
     private FeatureService featureService;
 
     @PostMapping(path = "/saveOrUpdateRole")
-    public BaseResponse<Long> saveOrUpdateRole(@RequestBody SaveOrUpdateRoleRequest request){
+    public BaseResponse<Long> saveOrUpdateRole(@RequestBody SaveOrUpdateRoleRequest request) {
         return featureService.saveOrUpdateRole(request);
     }
 
     @PostMapping(path = "/saveOrUpdateCategory")
-    public BaseResponse<Long> saveOrUpdateCategory(@RequestBody SaveOrUpdateCategoryRequest request){
+    public BaseResponse<Long> saveOrUpdateCategory(@RequestBody SaveOrUpdateCategoryRequest request) {
         return featureService.saveOrUpdateCategory(request);
     }
 
     @PostMapping(path = "/saveOrUpdatePostingan")
-    public BaseResponse<Long> saveOrUpdatePostingan(@RequestBody SaveOrUpdatePostinganRequest request,Authentication authentication){
+    public BaseResponse<Long> saveOrUpdatePostingan(@RequestBody SaveOrUpdatePostinganRequest request,
+            Authentication authentication) {
         User user = ClaimHelper.getUser(authentication);
-        return featureService.saveOrUpdatePostingan(request,user);
+        return featureService.saveOrUpdatePostingan(request, user);
     }
 
     @PostMapping(path = "/applyJob")
-    public BaseResponse<Long> applyJob(@ModelAttribute ApplicantsJob applicantsJob, Authentication authentication) throws IOException {
-        User user =  ClaimHelper.getUser(authentication);
-        return featureService.applyJob(applicantsJob,user);
+    public BaseResponse<Long> applyJob(@ModelAttribute ApplicantsJob applicantsJob, Authentication authentication)
+            throws IOException {
+        User user = ClaimHelper.getUser(authentication);
+        return featureService.applyJob(applicantsJob, user);
     }
 
     @GetMapping("/getDetailApplicant")
-    public BaseResponse<DetailApplicantResponse> getDetailApplicant(@RequestParam (value = "id", defaultValue = "id")Long id){
+    public BaseResponse<DetailApplicantResponse> getDetailApplicant(
+            @RequestParam(value = "id", defaultValue = "id") Long id) {
         return featureService.getDetailApplicant(id);
     }
 
     @GetMapping("/downloadCv")
-    public Resource downloadCv(@RequestParam (value = "id", defaultValue = "")Long id){
+    public Resource downloadCv(@RequestParam(value = "id", defaultValue = "") Long id) {
         return featureService.downloadCv(id);
     }
 
     @GetMapping(path = "/getDetailPostingan")
-    public BaseResponse<GetDetailPostinganResponse> getDetailPostinganResponseBaseResponse(@RequestParam (value = "", defaultValue = "")Long id){
+    public BaseResponse<GetDetailPostinganResponse> getDetailPostinganResponseBaseResponse(
+            @RequestParam(value = "", defaultValue = "") Long id) {
         return featureService.getDetailPostingan(id);
     }
 
     @PostMapping(path = "/getPostinganLlist")
-    public BaseResponse<GetListPostinganResponse> getPostinganList(@RequestBody GetPostinganListRequest request){
+    public BaseResponse<GetListPostinganResponse> getPostinganList(@RequestBody GetPostinganListRequest request) {
         return featureService.getPostinganList(request);
     }
 
     @PostMapping(path = "/getListApplicant")
-    public BaseResponse<GetListApplicantListResponse> getListApplicantList(@RequestBody  GetListApplicantRequest request){
+    public BaseResponse<GetListApplicantListResponse> getListApplicantList(
+            @RequestBody GetListApplicantRequest request) {
         return featureService.getListApplicantList(request);
     }
 
     @PostMapping(path = "/approveApplicant")
-    private BaseResponse<List<Long>> aproveJobApply(@RequestBody JobRequest request, Authentication authentication){
+    private BaseResponse<List<Long>> aproveJobApply(@RequestBody JobRequest request, Authentication authentication) {
         User user = ClaimHelper.getUser(authentication);
-        return featureService.approveJobApply(request,user);
+        return featureService.approveJobApply(request, user);
     }
 
     @PostMapping(path = "/rejectApplicant")
-    private BaseResponse<List<Long>> rejectApplicant(@RequestBody JobRequest request, Authentication authentication){
+    private BaseResponse<List<Long>> rejectApplicant(@RequestBody JobRequest request, Authentication authentication) {
         User user = ClaimHelper.getUser(authentication);
-        return featureService.rejectApplication(request,user);
+        return featureService.rejectApplication(request, user);
     }
+    // just update
 }
