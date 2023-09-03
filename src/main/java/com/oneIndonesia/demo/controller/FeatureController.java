@@ -83,5 +83,4 @@ public class FeatureController {
         User user = ClaimHelper.getUser(authentication);
         return featureService.rejectApplication(request, user);
     }
-    // just update
 }
